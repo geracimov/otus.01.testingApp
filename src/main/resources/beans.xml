@@ -17,4 +17,8 @@
 		<constructor-arg ref="localFileTestDataService" />
 	</bean>
 
+	<bean class="ru.otus.hw1.service.ConsoleUserCommunicator" id="userCommunicator">
+		<constructor-arg ref="simpleTestService" />
+	</bean>
+
 </beans>
