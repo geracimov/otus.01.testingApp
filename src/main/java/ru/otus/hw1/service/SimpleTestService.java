@@ -20,6 +20,7 @@ public class SimpleTestService implements TestService {
     private Test test;
     private Person person;
     private List<Answer> answers;
+    private int currQuestionIndex;
 
     public SimpleTestService(TestDataService testDataService) {
         this.testDataService = testDataService;
@@ -48,7 +49,7 @@ public class SimpleTestService implements TestService {
             return null;
         }
         return this.test.getQuestions()
-                        .get(answers.size());
+                        .get(currQuestionIndex++);
     }
 
     @Override
