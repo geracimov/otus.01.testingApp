@@ -10,7 +10,7 @@
 		<constructor-arg name="path" value="${path}" />
 		<constructor-arg name="globTemplate" value="${globTemplate}" />
 		<constructor-arg name="separator" value="${separator}" />
-		<constructor-arg name="correctSuffix" value="${correctSuffix}" />
+		<constructor-arg name="isCorrectSuffix" value="${isCorrectSuffix}" />
 	</bean>
 
 	<bean class="ru.otus.hw1.service.SimpleTestService" id="simpleTestService">

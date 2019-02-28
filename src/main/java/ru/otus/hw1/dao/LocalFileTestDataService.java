@@ -20,17 +20,17 @@ public class LocalFileTestDataService implements TestDataService {
     private final Path path;
     private final String globTemplate;
     private final String separator;
-    private final String correctSuffix;
+    private final String isCorrectSuffix;
     private volatile Map<String, Path> tests;
 
     public LocalFileTestDataService(Path path,
                                     String globTemplate,
                                     String separator,
-                                    String correctSuffix) {
+                                    String isCorrectSuffix) {
         this.path = path;
         this.globTemplate = globTemplate;
         this.separator = separator;
-        this.correctSuffix = correctSuffix;
+        this.isCorrectSuffix = isCorrectSuffix;
         tests = new HashMap<>();
         loadTestList();
     }
@@ -83,20 +83,19 @@ public class LocalFileTestDataService implements TestDataService {
             return null;
         }
 
-        List<Choice> choices = buildChoices(description);
+        List<Choice> choices = Stream.of(description)
+                                     .skip(1) //пропускаем текст вопроса
+                                     .map(s -> {
+                                         boolean isCorrect = s.matches(".*"
+                                                                       + isCorrectSuffix);
+                                         String text = isCorrect
+                                                       ? s.replaceAll(
+                                                 isCorrectSuffix,
+                                                 "")
+                                                       : s;
+                                         return new Choice(text, isCorrect);
+                                     })
+                                     .collect(Collectors.toList());
         return new Question(description[0], choices);
-    }
-
-    private List<Choice> buildChoices(String[] stringChoises) {
-        return Stream.of(stringChoises)
-                     .skip(1) //пропускаем текст вопроса
-                     .map(s -> {
-                         boolean isCorrect = s.matches(correctSuffix);
-                         String text = isCorrect
-                                       ? s.replaceAll(" *\\* *$", "")
-                                       : s;
-                         return new Choice(text, isCorrect);
-                     })
-                     .collect(Collectors.toList());
     }
 }
