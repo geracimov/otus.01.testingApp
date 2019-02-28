@@ -48,7 +48,6 @@ public class LocalFileTestDataService implements TestDataService {
     public Test getTest(String testName) {
         if (testName == null
             || "".equals(testName)
-            || tests.get(testName) == null) {
             return null;
         }
         Path path = tests.get(testName);
