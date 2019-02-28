@@ -47,7 +47,7 @@ public class LocalFileTestDataService implements TestDataService {
     @Override
     public Test getTest(String testName) {
         if (testName == null
-            || "".equals(testName)
+            || !testName.isEmpty()
             return null;
         }
         Path path = tests.get(testName);
