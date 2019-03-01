@@ -11,6 +11,8 @@ public interface TestService {
 
     void startTest(String testName, String firstname, String surname);
 
+    boolean testIsExists(String testName);
+
     Question next();
 
     boolean hasNext();

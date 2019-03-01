@@ -43,6 +43,11 @@ public class SimpleTestService implements TestService {
     }
 
     @Override
+    public boolean testIsExists(String testName) {
+        return testDataService.getTest(testName) != null;
+    }
+
+    @Override
     public Question next() {
         if (!hasNext()) {
             calcResult();

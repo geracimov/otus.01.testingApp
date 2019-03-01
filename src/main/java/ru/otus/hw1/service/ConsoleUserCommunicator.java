@@ -23,11 +23,15 @@ public class ConsoleUserCommunicator implements UserCommunicator {
         boolean repeatTest = true;
         while (repeatTest) {
             System.out.println("Available tests:\n" + service.getAvailTests());
-            String testNum = getAnswer("Select the test");
+            String testName = getAnswer("Select the test");
+            if (!service.testIsExists(testName)) {
+                System.err.println("\nTest is not exists. Enter correct test name!");
+                continue;
+            }
             String surname = getAnswer("Your surname");
             String firstname = getAnswer("Your firstname");
 
-            service.startTest(testNum, firstname, surname);
+            service.startTest(testName, firstname, surname);
             while (service.hasNext()) {
                 Question q = service.next();
                 boolean accepted = false;
@@ -38,8 +42,7 @@ public class ConsoleUserCommunicator implements UserCommunicator {
                 }
             }
             System.out.println(service.getResult());
-            repeatTest = getAnswer("Do you want to repeat again? (y/n)")
-                            .matches("(?i)y|yes");
+            repeatTest = getAnswer("Do you want to repeat again? (y/n)").matches("(?i)y|yes");
         }
     }
 

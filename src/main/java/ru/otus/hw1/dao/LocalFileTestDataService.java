@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Log
 public class LocalFileTestDataService implements TestDataService {
@@ -21,12 +22,9 @@ public class LocalFileTestDataService implements TestDataService {
     private final String globTemplate;
     private final String separator;
     private final String isCorrectSuffix;
-    private volatile Map<String, Path> tests;
+    private volatile Map<String, Test> tests;
 
-    public LocalFileTestDataService(Path path,
-                                    String globTemplate,
-                                    String separator,
-                                    String isCorrectSuffix) {
+    public LocalFileTestDataService(Path path, String globTemplate, String separator, String isCorrectSuffix) {
         this.path = path;
         this.globTemplate = globTemplate;
         this.separator = separator;
@@ -49,29 +47,36 @@ public class LocalFileTestDataService implements TestDataService {
         if (testName == null || testName.isEmpty()) {
             return null;
         }
-        Path path = tests.get(testName);
-
-        try {
-            List<Question> questions = Files.lines(path)
-                                            .map(this::buildQuestion)
-                                            .filter(Objects::nonNull)
-                                            .collect(Collectors.toList());
-            return new Test(testName, questions);
-        } catch (IOException e) {
-            log.severe("Ошибка чтения файла теста: " + e.getLocalizedMessage());
-            return null;
-        }
+        return tests.get(testName);
     }
 
     private void loadTestList() {
         if (Files.isDirectory(path)) {
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(path,
-                                                                         globTemplate)) {
-                stream.forEach(file -> tests.put(FilenameUtils.getBaseName(file.toString()),
-                                                 file));
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(path, globTemplate)) {
+                Stream<Path> pathStream = StreamSupport.stream(ds.spliterator(), false);
+                pathStream.map(this::buildTest)
+                          .filter(Objects::nonNull)
+                          .forEach(test -> tests.put(test.getName(), test));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private Test buildTest(Path file) {
+        if (file == null) {
+            return null;
+        }
+        try {
+            List<Question> questions = Files.lines(file)
+                                            .map(this::buildQuestion)
+                                            .filter(Objects::nonNull)
+                                            .collect(Collectors.toList());
+            String testName = FilenameUtils.getBaseName(file.toString());
+            return new Test(testName, questions);
+        } catch (IOException e) {
+            log.severe("Error parsing file: " + file.toString());
+            return null;
         }
     }
 
@@ -79,19 +84,16 @@ public class LocalFileTestDataService implements TestDataService {
         String[] description = str.split(this.separator);
         //в строке должен как минимум 1 вопрос и 1 ответ
         if (description.length < 2) {
-            log.severe("Неверный формат описания вопроса ! " + str);
+            log.severe("Incorrect question format! Skip question: " + str);
             return null;
         }
 
         List<Choice> choices = Stream.of(description)
                                      .skip(1) //пропускаем текст вопроса
                                      .map(s -> {
-                                         boolean isCorrect = s.matches(".*"
-                                                                       + isCorrectSuffix);
+                                         boolean isCorrect = s.matches(".*" + isCorrectSuffix);
                                          String text = isCorrect
-                                                       ? s.replaceAll(
-                                                 isCorrectSuffix,
-                                                 "")
+                                                       ? s.replaceAll(isCorrectSuffix, "")
                                                        : s;
                                          return new Choice(text, isCorrect);
                                      })
