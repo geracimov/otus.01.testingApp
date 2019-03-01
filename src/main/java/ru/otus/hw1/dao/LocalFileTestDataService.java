@@ -2,6 +2,9 @@ package ru.otus.hw1.dao;
 
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import ru.otus.hw1.domain.Choice;
 import ru.otus.hw1.domain.Question;
 import ru.otus.hw1.domain.Test;
@@ -16,6 +19,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Log
+@Service
 public class LocalFileTestDataService implements TestDataService {
 
     private final Path path;
@@ -24,7 +28,11 @@ public class LocalFileTestDataService implements TestDataService {
     private final String isCorrectSuffix;
     private volatile Map<String, Test> tests;
 
-    public LocalFileTestDataService(Path path, String globTemplate, String separator, String isCorrectSuffix) {
+    @Autowired
+    public LocalFileTestDataService(@Value("${csvPath}") Path path,
+                                    @Value("${globTemplate}") String globTemplate,
+                                    @Value("${separator}") String separator,
+                                    @Value("${isCorrectSuffix}") String isCorrectSuffix) {
         this.path = path;
         this.globTemplate = globTemplate;
         this.separator = separator;

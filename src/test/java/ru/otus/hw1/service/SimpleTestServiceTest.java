@@ -77,14 +77,6 @@ public class SimpleTestServiceTest {
     }
 
     @Test
-    public void getMoreNextQuestionWithoutAnswer() {
-        ts.startTest("test2", "firstname", "surname");
-        assertEquals(ts.next(), someQuestion1);
-        assertEquals(ts.next(), someQuestion1);
-        assertEquals(ts.next(), someQuestion1);
-    }
-
-    @Test
     public void getMoreNextQuestionWithAnswerToFinish() {
         ts.startTest("test2", "firstname", "surname");
 

@@ -1,5 +1,8 @@
 package ru.otus.hw1.service;
 
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.otus.hw1.dao.TestDataService;
 import ru.otus.hw1.domain.*;
 
@@ -13,6 +16,8 @@ import java.util.stream.Stream;
  * логика подсчета баллов выдуманная:суммируется количество верно отмеченных
  * ответов, несмотря на неправильно отмеченные
  */
+@Log
+@Service
 public class SimpleTestService implements TestService {
 
 
@@ -22,6 +27,7 @@ public class SimpleTestService implements TestService {
     private List<Answer> answers;
     private int currQuestionIndex;
 
+    @Autowired
     public SimpleTestService(TestDataService testDataService) {
         this.testDataService = testDataService;
     }
@@ -76,6 +82,7 @@ public class SimpleTestService implements TestService {
             answers.add(new Answer(question, choices));
             return true;
         } catch (Exception e) {
+            log.severe(String.format("Error during answer the question/answer (%s)/(%s)", question, answers));
             return false;
         }
     }

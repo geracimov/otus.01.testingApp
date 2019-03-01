@@ -1,13 +1,17 @@
 package ru.otus.hw1.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.otus.hw1.domain.Question;
 
 import java.util.Scanner;
 
+@Service
 public class ConsoleUserCommunicator implements UserCommunicator {
     private final TestService service;
     private final Scanner scanner;
 
+    @Autowired
     public ConsoleUserCommunicator(TestService service) {
         this.service = service;
         scanner = new Scanner(System.in);
