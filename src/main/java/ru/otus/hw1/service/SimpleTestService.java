@@ -8,6 +8,7 @@ import ru.otus.hw1.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,7 +20,6 @@ import java.util.stream.Stream;
 @Log
 @Service
 public class SimpleTestService implements TestService {
-
 
     private final TestDataService testDataService;
     private Test test;
@@ -33,15 +33,18 @@ public class SimpleTestService implements TestService {
     }
 
     @Override
-    public Set<String> getAvailTests() {
-        return testDataService.getAvailTests();
+    public Set<String> getAvailTests(Locale locale) {
+        return testDataService.getAvailTests()
+                              .stream()
+                              .filter(t -> t.matches(".+_" + locale.getLanguage()))
+                              .collect(Collectors.toSet());
     }
 
     @Override
     public void startTest(String testName, String firstname, String surname) {
         Test test = testDataService.getTest(testName);
         if (test == null) {
-            throw new IllegalArgumentException("Выбрано неверное имя теста!");
+            throw new IllegalArgumentException("Incorrect test name!");
         }
         this.test = test;
         this.person = new Person(firstname, surname);
@@ -90,7 +93,7 @@ public class SimpleTestService implements TestService {
     @Override
     public Result getResult() {
         if (hasNext()) {
-            throw new IllegalStateException("Тест еще не завершен!");
+            throw new IllegalStateException("Test is not comleted!");
         }
         return calcResult();
     }

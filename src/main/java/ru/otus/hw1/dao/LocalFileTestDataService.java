@@ -95,17 +95,21 @@ public class LocalFileTestDataService implements TestDataService {
             log.severe("Incorrect question format! Skip question: " + str);
             return null;
         }
+        String[] questions = Arrays.copyOfRange(description, 1, description.length);
 
-        List<Choice> choices = Stream.of(description)
-                                     .skip(1) //пропускаем текст вопроса
-                                     .map(s -> {
-                                         boolean isCorrect = s.matches(".*" + isCorrectSuffix);
-                                         String text = isCorrect
-                                                       ? s.replaceAll(isCorrectSuffix, "")
-                                                       : s;
-                                         return new Choice(text, isCorrect);
-                                     })
-                                     .collect(Collectors.toList());
+        List<Choice> choices = buildChoices(questions);
         return new Question(description[0], choices);
+    }
+
+    private List<Choice> buildChoices(String[] stringChoises) {
+        return Stream.of(stringChoises)
+                     .map(s -> {
+                         boolean isCorrect = s.matches(".*" + isCorrectSuffix);
+                         String text = isCorrect
+                                       ? s.replaceAll(isCorrectSuffix, "")
+                                       : s;
+                         return new Choice(text, isCorrect);
+                     })
+                     .collect(Collectors.toList());
     }
 }
