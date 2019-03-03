@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="application.properties" />
+	</bean>
+
+	<bean class="ru.otus.hw1.dao.LocalFileTestDataService" id="localFileTestDataService">
+		<constructor-arg name="path" value="${path}" />
+		<constructor-arg name="globTemplate" value="${globTemplate}" />
+		<constructor-arg name="separator" value="${separator}" />
+		<constructor-arg name="isCorrectSuffix" value="${isCorrectSuffix}" />
+	</bean>
+
+	<bean class="ru.otus.hw1.service.SimpleTestService" id="simpleTestService">
+		<constructor-arg ref="localFileTestDataService" />
+	</bean>
+
+	<bean class="ru.otus.hw1.service.ConsoleUserCommunicator" id="userCommunicator">
+		<constructor-arg ref="simpleTestService" />
+	</bean>
+
+</beans>
