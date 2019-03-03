@@ -3,11 +3,12 @@ package ru.otus.hw1.service;
 import ru.otus.hw1.domain.Question;
 import ru.otus.hw1.domain.Result;
 
+import java.util.Locale;
 import java.util.Set;
 
 public interface TestService {
 
-    Set<String> getAvailTests();
+    Set<String> getAvailTests(Locale locale);
 
     void startTest(String testName, String firstname, String surname);
 

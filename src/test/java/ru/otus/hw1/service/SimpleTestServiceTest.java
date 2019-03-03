@@ -8,10 +8,7 @@ import ru.otus.hw1.domain.Choice;
 import ru.otus.hw1.domain.Question;
 import ru.otus.hw1.domain.Result;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,7 +27,7 @@ public class SimpleTestServiceTest {
 
     @Before
     public void init() {
-        testNames = Stream.of("test1", "test2", "test3")
+        testNames = Stream.of("test1_en", "test2_en", "test3_en")
                           .collect(Collectors.toSet());
         someChoices1 = Arrays.asList(new Choice("case1", true),
                                      new Choice("case2", false),
@@ -59,7 +56,7 @@ public class SimpleTestServiceTest {
     @Test
     public void getAvailTests() {
         assertEquals("Sets of tests are not equals",
-                     ts.getAvailTests(),
+                     ts.getAvailTests(Locale.ENGLISH),
                      testNames);
     }
 
@@ -74,14 +71,6 @@ public class SimpleTestServiceTest {
         ts.startTest("test2", "firstname", "surname");
         assertTrue(ts.hasNext());
         assertThat(ts.next(), instanceOf(Question.class));
-    }
-
-    @Test
-    public void getMoreNextQuestionWithoutAnswer() {
-        ts.startTest("test2", "firstname", "surname");
-        assertEquals(ts.next(), someQuestion1);
-        assertEquals(ts.next(), someQuestion1);
-        assertEquals(ts.next(), someQuestion1);
     }
 
     @Test

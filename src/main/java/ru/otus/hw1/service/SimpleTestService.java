@@ -1,10 +1,14 @@
 package ru.otus.hw1.service;
 
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.otus.hw1.dao.TestDataService;
 import ru.otus.hw1.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,8 +17,9 @@ import java.util.stream.Stream;
  * логика подсчета баллов выдуманная:суммируется количество верно отмеченных
  * ответов, несмотря на неправильно отмеченные
  */
+@Log
+@Service
 public class SimpleTestService implements TestService {
-
 
     private final TestDataService testDataService;
     private Test test;
@@ -22,20 +27,24 @@ public class SimpleTestService implements TestService {
     private List<Answer> answers;
     private int currQuestionIndex;
 
+    @Autowired
     public SimpleTestService(TestDataService testDataService) {
         this.testDataService = testDataService;
     }
 
     @Override
-    public Set<String> getAvailTests() {
-        return testDataService.getAvailTests();
+    public Set<String> getAvailTests(Locale locale) {
+        return testDataService.getAvailTests()
+                              .stream()
+                              .filter(t -> t.matches(".+_" + locale.getLanguage()))
+                              .collect(Collectors.toSet());
     }
 
     @Override
     public void startTest(String testName, String firstname, String surname) {
         Test test = testDataService.getTest(testName);
         if (test == null) {
-            throw new IllegalArgumentException("Выбрано неверное имя теста!");
+            throw new IllegalArgumentException("Incorrect test name!");
         }
         this.test = test;
         this.person = new Person(firstname, surname);
@@ -76,6 +85,7 @@ public class SimpleTestService implements TestService {
             answers.add(new Answer(question, choices));
             return true;
         } catch (Exception e) {
+            log.severe(String.format("Error during answer the question/answer (%s)/(%s)", question, answers));
             return false;
         }
     }
@@ -83,7 +93,7 @@ public class SimpleTestService implements TestService {
     @Override
     public Result getResult() {
         if (hasNext()) {
-            throw new IllegalStateException("Тест еще не завершен!");
+            throw new IllegalStateException("Test is not comleted!");
         }
         return calcResult();
     }
